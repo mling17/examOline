@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'captcha',  # 验证码
+    'account',
 ]
 
 MIDDLEWARE = [
@@ -46,6 +46,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'account.middleware.auth.AuthMiddleware',
 ]
 
 ROOT_URLCONF = 'examOnline.urls'
@@ -117,3 +118,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+WHITE_REGEX_URL_LIST = [
+    "/account/register/",
+    "/account/login/",
+    "/account/logout/",
+    "/account/forget/",
+    "/account/image/code/",
+    "/account/email_active/",
+    "/account/index/",
+]
+# session过期时间，默认14天
+SESSION_EXPIRE = 60 * 60 * 24 * 14
+# 登录承购后的跳转页面,namespace:name
+SIGNED_DIRECT = 'account:index'
+# 邮件token过期时间
+TOKEN_EXPIRE = 3600
+try:
+    from .local_settings import *
+except ImportError:
+    pass

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% if next_pg %}
+        <meta http-equiv="refresh" content="5;url={{ next_pg }}">
+    {% endif %}
+    <title>消息</title>
+</head>
+<body>
+{{ msg }}
+</body>
+</html>
