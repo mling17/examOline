@@ -124,6 +124,8 @@ def email_active(request):
 def login(request):
     """ 用户名和密码登录 """
     if request.method == 'GET':
+        if request.session.get('user_id'):
+            return redirect('account:index')
         form = LoginForm(request)
         return render(request, 'login.html', {'form': form})
     form = LoginForm(request, data=request.POST)
