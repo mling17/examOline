@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block css %}
+    <style>
+        .question_title {
+            font-weight: 700;
+            font-size: 16px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <div class="luffy-container">
+        <div class="btn-group" style="margin: 5px 0">
+
+            <a class="btn btn-default" href="#">
+                <i class="fa fa-plus-square" aria-hidden="true"></i> 添加题目
+            </a>
+        </div>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>编号</th>
+                <th>题型</th>
+                <th>题目</th>
+                <th>答案</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in questions %}
+                <tr>
+                    <td>{{ row.sort_num }}</td>
+                    <td>{{ row.get_type_display }}</td>
+                    <td>{{ row.title }}</td>
+                    <td>{{ row.answer.title }}</td>
+                    <td>{{ row.created_time }}</td>
+                    <td>
+                        <a href="#" style="color: #333333"><i
+                                class="fa fa-edit"></i></a>
+                        <a href="#" style="color: #333333"><i
+                                class="fa fa-trash-o"></i></a>
+                    </td>
+                </tr>
+                <tr style="display: none">
+                    <td colspan="6" style="padding: 20px 50px">
+                        <div data-v-0d39ecca="" class="question_title">{{ row.title |safe }}</div>
+                        {% for option in row.options %}
+                            <div data-v-0d39ecca="" class="options">
+                                <div data-v-0d39ecca="" class="options_title" style="float: left"> {{ option.title }}、
+                                </div>
+                                <div data-v-0d39ecca="" class="options_content">
+                                    <div data-v-0d39ecca="" class="content"><p>{{ option.content |safe }}</p></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="answer">
+                            <span class="answer_label">正确答案:</span>
+                            <span class="answer_content">{{ row.answer.title }}</span>
+                        </div>
+                        <div class="analysis">
+                            <span class="analysis_label">试题解析:</span>
+                            <span class="analysis_content">{{ row.analysis }}</span>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("tr").click(function () {
+            $(this).next().toggle()
+        });
+    </script>
+{% endblock %}

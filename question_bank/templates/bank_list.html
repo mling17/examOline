@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="luffy-container">
+        <div class="btn-group" style="margin: 5px 0">
+
+            <a class="btn btn-default" href="{% url "question_bank:bank_add" %}">
+                <i class="fa fa-plus-square" aria-hidden="true"></i> 添加题库
+            </a>
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>封面</th>
+                <th>题库名称</th>
+                <th>简介</th>
+                <th>所属科目</th>
+                <th>题目数量</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in banks %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ row.cover }}</td>
+                    <td><a href="#" data-toggle="modal" onclick="change('{% url 'question_bank:bank_edit' row.id %}')"
+                           data-target="#myModal">{{ row.title }}</a></td>
+                    <td>{{ row.content }}</td>
+                    <td>{{ row.subject_name }}</td>
+                    <td><a href="{% url 'question_bank:question_list' %}?bid={{ row.id }}">{{ row.count }}</a></td>
+                    <td>{{ row.created_time }}</td>
+                    <td>
+                        <a href="#" style="color: #333333">添加题目<i
+                                class="fa fa-edit"></i></a>
+                        <a href="{% url 'question_bank:bank_delete' row.id %}" style="color: #333333"><i
+                                class="fa fa-trash-o"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            {#            <tr>#}
+            {#                <td><a href="#" data-toggle="modal" onclick="func('{% url 'question_bank:bank_edit' 1 %}')"#}
+            {#                       data-target="#myModal">asdfas</a></td>#}
+            {#            </tr>#}
+            </tbody>
+        </table>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                </div>
+                <div class="modal-body">
+                    <span></span>
+                    <form>
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">题库名称:</label>
+                            <input type="text" class="form-control" id="bank-title" name="title" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">简介:</label>
+                            <input type="text" class="form-control" id="bank-content" name="content" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">所属科目:</label>
+                            <input type="text" class="form-control" id="bank-subject-name" name="subject_name" value="">
+                        </div>
+                    </form>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="changeCommit">修改</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        var pk = 0;
+        $('#changeCommit').click(
+            function commitChange() {
+                var url = "{% url 'question_bank:bank_edit' 0 %}".replace("0", pk);
+                var data = $('.modal-body form').serialize();
+                console.log(data, typeof (data))
+                $.ajax({
+                    type: 'post',
+                    async: true,
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    url: url,
+                    data: data,
+                    success: function (res) {
+                        if (res.status == 'success') {
+                            console.log(res)
+                            console.log(window.location.href)
+                            window.location.href += ''
+                        } else {
+                            alert(res.msg)
+                        }
+
+                    },
+                    error: function () {
+
+                    }
+                })
+            }
+        )
+
+        function change(url) {
+            // 获取模态对话框数据
+            $.ajax({
+                type: 'get',
+                async: true,
+                dataType: 'json',
+                url: url,
+                success: function (res) {
+                    console.log(res)
+                    if (res.status === 'success') {
+                        $('.modal-body form').removeClass('hide')
+                        $('.modal-body span').text('')
+                        $('#changeCommit').removeAttr('disabled')
+                        $('#bank-title').val(res.title)
+                        $('#bank-content').val(res.content)
+                        $('#bank-subject-name').val(res.subject_name)
+                        pk = res.id
+                    } else {
+                        $('.modal-body form').addClass('hide')
+                        $('.modal-body span').text(res.msg)
+                        $('#changeCommit').attr('disabled', 'disabled')
+
+                    }
+
+                },
+                error: function () {
+
+                }
+            })
+        }
+    </script>
+{% endblock %}
