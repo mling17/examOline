@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -11,13 +12,13 @@
     <!-- Bootstrap -->
     <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-{#    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>#}
-{#    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>#}
-    <![endif]-->
+    <style>
+        table th {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
     {% block css %}{% endblock %}
 </head>
 <body>
@@ -38,8 +39,8 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#">主页</a></li>
-                <li><a href="#">Link1 <span class="sr-only">(current)</span></a></li>
+                <li class="active"><a href="{% url 'account:index' %}">主页</a></li>
+                <li><a href="{% url 'question_bank:bank_list' %}">题库 <span class="sr-only">(current)</span></a></li>
                 <li><a href="#">Link2</a></li>
 
             </ul>
@@ -65,8 +66,8 @@
             </ul>
         {% else %}
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="{% url 'account:login' %}" >登录</a></li>
-                <li><a href="{% url 'account:register' %}" >注册</a></li>
+                <li><a href="{% url 'account:login' %}">登录</a></li>
+                <li><a href="{% url 'account:register' %}">注册</a></li>
             </ul>
         {% endif %}
         </div><!-- /.navbar-collapse -->
@@ -75,11 +76,11 @@
 
 {% block content %}{% endblock %}
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+</body>
 <script src="{% static 'js/jquery-3.2.1.js' %}"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+<script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
 <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
 {% block js %}
 {% endblock %}
-</body>
 </html>

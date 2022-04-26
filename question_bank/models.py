@@ -1,5 +1,6 @@
 from django.db import models
 from account.models import User
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 # Create your models here.
@@ -21,11 +22,15 @@ class QuestionBank(models.Model):
             return 0
         return num
 
+    def __str__(self):
+        return self.title
+
 
 question_type_choice = [
     (1, '单选题'),
     (2, '多选题'),
     (3, '判断题'),
+    (4, '填空题'),
     (5, '简答题'),
     (6, '综合题'),
 ]
@@ -36,9 +41,9 @@ class Question(models.Model):
     question_bank = models.ForeignKey(verbose_name='关联题库', to='QuestionBank', on_delete=models.CASCADE)
     # subject_id = models.CharField(verbose_name='标题', max_length=32)
     type = models.SmallIntegerField(verbose_name='题目类型', choices=question_type_choice)
-    title = models.CharField(verbose_name='题目', max_length=256)
-    # title_str = models.CharField(verbose_name='标题', max_length=32)
-    analysis = models.CharField(verbose_name='解析', max_length=256)
+    # title = models.CharField(verbose_name='题目', max_length=512)
+    title = RichTextUploadingField(verbose_name='题目', max_length=1024)
+    analysis = models.TextField(verbose_name='解析', max_length=1024)
     sort_num = models.IntegerField(verbose_name='排序')
     update_time = models.DateTimeField(verbose_name='更新时间', auto_now=True)
     created_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
@@ -50,7 +55,8 @@ class Question(models.Model):
         return option_dict
 
     def answer(self):
-        return ChoiceOptions.objects.filter(question=self, is_answer=True).first()
+        res = ChoiceOptions.objects.filter(question=self, is_answer=True).values()
+        return res
 
 
 class ChoiceOptions(models.Model):

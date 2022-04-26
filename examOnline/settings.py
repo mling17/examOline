@@ -35,10 +35,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'question_bank',
+    'account',
     'ckeditor',
     'ckeditor_uploader',
-    'account',
-    'question_bank',
+
 ]
 
 MIDDLEWARE = [
@@ -137,10 +138,58 @@ SESSION_EXPIRE = 60 * 60 * 24 * 14
 SIGNED_DIRECT = 'account:index'
 # 邮件token过期时间
 TOKEN_EXPIRE = 3600
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-CKEDITOR_UPLOAD_PATH = '/upload'
+
+# 富文本
+CKEDITOR_UPLOAD_PATH = "images"  # 上传图片保存路径，如果没有图片存储或者使用自定义存储位置，那么则直接写  ' ' ,如果是使用django本身的存储方式，那么你就指名一个目录用来存储即可。
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        # 'height': 300,
+        # 'width': 600
+        "removePlugins": "exportpdf",
+    }
+}
+CKEDITOR_CONFIGS = {
+    # （1）默认配置
+    # 'default': {
+    #     'toolbar': 'full',  # 工具条功能
+    #     'height': 300,  # 编辑器高度
+    #     'width': 800,  # 编辑器宽
+    # },
+
+    # （3）自定义配置带代码块显示
+    'default': {
+        'height': 100,  # 编辑器高度
+        'toolbar': (
+            ['div', 'Source', '-', 'Preview', '-', 'Templates'],
+            ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'SpellChecker', 'Scayt'],
+            ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'RemoveFormat'],
+            # ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField'],
+            ['Bold', 'Italic', 'Underline', 'Strike', '-', 'Subscript', 'Superscript'],
+            ['NumberedList', 'BulletedList'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            # ['Link', 'Unlink', 'Anchor'],
+            ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak'],
+            ['Styles', 'Format', 'Font', 'FontSize'],
+            ['TextColor', 'BGColor'],
+            ['Maximize', 'ShowBlocks', 'pbckcode'],
+            ['Blockquote', 'CodeSnippet'],
+        ),
+        'width': 'auto',
+        # 添加按钮在这里
+        'toolbar_Custom': [
+            ['NumberedList', 'BulletedList'],
+            ['Blockquote', 'CodeSnippet'],
+        ],
+        # 插件
+        'extraPlugins': ','.join(['codesnippet', 'widget', 'lineutils', ]),
+        'removePlugins':'exportpdf'
+    },
+}
+# 分页
+PER_PAGE_COUNT = 20
 try:
     from .local_settings import *
 except ImportError:

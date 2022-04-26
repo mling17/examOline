@@ -1,15 +1,29 @@
 {% extends 'base.html' %}
+{% load question %}
+{% block css %}
+    <style>
+        table td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
+
+    </style>
+{% endblock %}
 {% block content %}
 
-    <div class="luffy-container">
+    <div class="container">
         <div class="btn-group" style="margin: 5px 0">
 
             <a class="btn btn-default" href="{% url "question_bank:bank_add" %}">
                 <i class="fa fa-plus-square" aria-hidden="true"></i> 添加题库
             </a>
+            <a class="btn btn-default" style="margin-left: 5px" href="{% url "question_bank:import_question" %}">
+                <i class="fa fa-plus-square" aria-hidden="true"></i> 批量导入
+            </a>
         </div>
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover table-condensed">
             <thead>
             <tr>
                 <th>序号</th>
@@ -26,7 +40,15 @@
             {% for row in banks %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ row.cover }}</td>
+                    <td>
+                        <div class="cell" style="width: 40px; height: 18px;">
+                            <a href="{% url 'question_bank:question_list' %}?bid={{ row.id }}">
+                                <img src="{{ row.cover }}" alt="封面" class='img-rounded'
+                                     style="object-fit: fill;vertical-align: top;width: 40px;height: 18px;">
+                            </a>
+                        </div>
+
+                    </td>
                     <td><a href="#" data-toggle="modal" onclick="change('{% url 'question_bank:bank_edit' row.id %}')"
                            data-target="#myModal">{{ row.title }}</a></td>
                     <td>{{ row.content }}</td>
@@ -34,7 +56,7 @@
                     <td><a href="{% url 'question_bank:question_list' %}?bid={{ row.id }}">{{ row.count }}</a></td>
                     <td>{{ row.created_time }}</td>
                     <td>
-                        <a href="#" style="color: #333333">添加题目<i
+                        <a href="{% url 'question_bank:question_add' %}?bid={{ row.id }}" style="color: #333333">添加题目<i
                                 class="fa fa-edit"></i></a>
                         <a href="{% url 'question_bank:bank_delete' row.id %}" style="color: #333333"><i
                                 class="fa fa-trash-o"></i></a>
@@ -47,6 +69,11 @@
             {#            </tr>#}
             </tbody>
         </table>
+        <nav>
+            <ul class="pagination">
+                {{ pager.page_html|safe }}
+            </ul>
+        </nav>
     </div>
     <!-- Modal -->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -55,7 +82,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                    <h4 class="modal-title" id="myModalLabel">修改题库信息</h4>
                 </div>
                 <div class="modal-body">
                     <span></span>
@@ -79,7 +106,6 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" id="changeCommit">修改</button>
-
                 </div>
             </div>
         </div>
@@ -91,7 +117,7 @@
         var pk = 0;
         $('#changeCommit').click(
             function commitChange() {
-                var url = "{% url 'question_bank:bank_edit' 0 %}".replace("0", pk);
+                var url = "{% url 'question_bank:bank_edit' 0 %}".replace("0", pk); //todo
                 var data = $('.modal-body form').serialize();
                 console.log(data, typeof (data))
                 $.ajax({
@@ -107,7 +133,7 @@
                         if (res.status == 'success') {
                             console.log(res)
                             console.log(window.location.href)
-                            window.location.href += ''
+                            {#window.location.href += ''#}
                         } else {
                             alert(res.msg)
                         }

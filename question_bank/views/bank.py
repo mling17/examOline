@@ -7,13 +7,28 @@ from django.urls import reverse
 from django.db import transaction
 from openpyxl import load_workbook
 from question_bank.forms.upload_file import UploadFileModelForm
+from utils.pagination import Pagination
+from django.conf import settings
 
 
 # Create your views here.
 def bank_list(request):
     if request.method == 'GET':
         banks = models.QuestionBank.objects.filter(is_valid=True).all()
-        return render(request, 'bank_list.html', {'banks': banks})
+        print(banks)
+        all_count = models.QuestionBank.objects.filter(is_valid=True).count()
+        print(all_count)
+        query_params = request.GET.copy()
+        query_params._mutable = True
+        pager = Pagination(
+            current_page=request.GET.get('page'),
+            all_count=all_count,
+            base_url=request.path_info,
+            query_params=query_params,
+            per_page=settings.PER_PAGE_COUNT,
+        )
+        bank_data_list = banks[pager.start:pager.end]
+        return render(request, 'bank_list.html', {'banks': bank_data_list, 'pager': pager})
 
 
 def bank_add(reqeust):
@@ -109,18 +124,20 @@ def load_question(file):
                     answer = q_dic['answer'].upper().strip()
                     options = eval(q_dic['options'])
                     for option in options:
-                        option_obj = models.ChoiceOptions()
                         title = option.get('title')
+                        if title.upper() == 'C' and q_dic['type'] == 3:
+                            break
+                        option_obj = models.ChoiceOptions()
                         content = option.get('content')
                         if title.upper().strip() == answer:
                             option_obj.is_answer = True
+                        option_obj.title = title
                         option_obj.content = content
                         option_obj.question = new_question_obj  # 选项与题关联
                         option_obj.save()
         except Exception as e:
             print(q_dic)
             print(e)
-
             return False
 
 
@@ -139,9 +156,11 @@ def import_question(request):
         new_file_obj.file = raw_file
         new_file_obj.name = origin_name
         new_file_obj.user_id = request.user_info.user.id
-        # new_file_obj.save()
+        new_file_obj.save()
         result = load_question(raw_file.open())
         if result is False:
-            return HttpResponse('err')
-        return HttpResponse('ok')
+            content = {'msg': '导入失败，3秒后跳转...', 'next_pg': reverse('question_bank:bank_list')}
+        else:
+            content = {'msg': '导入成功，3秒后跳转...', 'next_pg': reverse('question_bank:bank_list')}
+        return render(request, 'common_msg.html', context=content)
     return render(request, 'test_page.html', {'form': form})

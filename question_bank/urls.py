@@ -25,8 +25,9 @@ urlpatterns = [
     re_path(r'bank_delete/(?P<pk>\d+)/$', bank.delete, name='bank_delete'),
     # 题
     path('question_list/', question.question_list, name='question_list'),
-    path('question_add/', question.question_add, name='question_add'),
+    re_path(r'question_add/', question.question_add, name='question_add'),
     re_path(r'question_edit/(?P<pk>\d+)/$', question.question_change, name='question_edit'),
+    path(r'get_question_options/', question.get_question_options, name='get_question_options'),
     re_path(r'question_delete/(?P<pk>\d+)/$', question.question_delete, name='question_delete'),
     path('import_question/', bank.import_question, name='import_question'),
 ]

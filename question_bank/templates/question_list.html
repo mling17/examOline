@@ -1,22 +1,40 @@
 {% extends 'base.html' %}
+{% load question %}
 {% block css %}
     <style>
+        tr {
+            display: table-row;
+            vertical-align: inherit;
+            border-color: inherit;
+        }
+
         .question_title {
             font-weight: 700;
             font-size: 16px;
+        }
+
+        .cell {
+            display: inline-block;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: break-all;
+            line-height: 23px;
+            padding-right: 10px;
         }
     </style>
 {% endblock %}
 {% block content %}
 
-    <div class="luffy-container">
+    <div class="container">
         <div class="btn-group" style="margin: 5px 0">
 
-            <a class="btn btn-default" href="#">
+            <a class="btn btn-default" href="{% url 'question_bank:question_add' %}?bid={{ bid }}">
                 <i class="fa fa-plus-square" aria-hidden="true"></i> 添加题目
             </a>
         </div>
-        <table class="table table-hover">
+        <table class="table table-hover" style="width: 1052px;">
             <thead>
             <tr>
                 <th>编号</th>
@@ -30,43 +48,73 @@
             <tbody>
             {% for row in questions %}
                 <tr>
-                    <td>{{ row.sort_num }}</td>
-                    <td>{{ row.get_type_display }}</td>
-                    <td>{{ row.title }}</td>
-                    <td>{{ row.answer.title }}</td>
-                    <td>{{ row.created_time }}</td>
                     <td>
-                        <a href="#" style="color: #333333"><i
-                                class="fa fa-edit"></i></a>
-                        <a href="#" style="color: #333333"><i
-                                class="fa fa-trash-o"></i></a>
+                        <div class="cell" style="width: 50px">{{ forloop.counter }}</div>
+                    </td>
+                    <td>
+                        <div class="cell" style="width: 60px">{{ row.get_type_display }}</div>
+                    </td>
+                    <td>
+                        <div class="cell" style="width: 500px">
+                            <span>{{ row.title |cut:'p' }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="cell" style="width: 50px">
+                            {% for answer in row.answer %}
+                                {{ answer.title }}
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="cell" style="width: 150px">{{ row.created_time }}</div>
+                    </td>
+                    <td style="width: 60px">
+                        <div class="cell">
+                            <a href="{% memory_url request 'question_bank:question_edit' row.id %}" style="color: #333333">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a href="{% memory_url request 'question_bank:question_delete' row.id %}" style="color: #333333">
+                                <i class="fa fa-trash-o"></i>
+                            </a>
+                        </div>
+
                     </td>
                 </tr>
                 <tr style="display: none">
                     <td colspan="6" style="padding: 20px 50px">
-                        <div data-v-0d39ecca="" class="question_title">{{ row.title |safe }}</div>
+                        <div class="question_title">{{ row.title|cut:'_x000D_'  | safe }}</div>
                         {% for option in row.options %}
-                            <div data-v-0d39ecca="" class="options">
-                                <div data-v-0d39ecca="" class="options_title" style="float: left"> {{ option.title }}、
+                            <div class="options">
+                                <div class="options_title" style="float: left"> {{ option.title }}、
                                 </div>
-                                <div data-v-0d39ecca="" class="options_content">
-                                    <div data-v-0d39ecca="" class="content"><p>{{ option.content |safe }}</p></div>
+                                <div class="options_content">
+                                    <div class="content"><p>{{ option.content |safe }}</p></div>
                                 </div>
                             </div>
                         {% endfor %}
                         <div class="answer">
                             <span class="answer_label">正确答案:</span>
-                            <span class="answer_content">{{ row.answer.title }}</span>
+                            <span class="answer_content">
+                                {% for answer in row.answer %}
+                                    {{ answer.title }}
+                                {% endfor %}
+                            </span>
                         </div>
                         <div class="analysis">
                             <span class="analysis_label">试题解析:</span>
-                            <span class="analysis_content">{{ row.analysis }}</span>
+                            <span class="analysis_content">{{ row.analysis |safe }}</span>
                         </div>
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+        <nav>
+            <ul class="pagination">
+                {{ pager.page_html|safe }}
+            </ul>
+        </nav>
     </div>
 
 {% endblock %}

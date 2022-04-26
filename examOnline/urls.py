@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -22,5 +22,6 @@ urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('account/', include(('account.urls', 'account'), namespace='account')),
                   path('question_bank/', include(('question_bank.urls', 'question_bank'), namespace='question_bank')),
-                  path('ckeditor/', include('ckeditor_uploader.urls')),
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  re_path(r'^ckeditor/', include('ckeditor_uploader.ckeditor_urls')),
+                  # 此处修改ckeditor源码取消验证url.py改成ckeditor_urls，将staff_member_required去掉
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # 没有这一句无法显示上传的图片
